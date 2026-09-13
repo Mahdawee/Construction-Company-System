@@ -21,6 +21,10 @@ $currencies = $pdo->query('SELECT * FROM currencies ORDER BY id')->fetchAll();
 $kahtaStmt = $pdo->prepare('SELECT id, code, name FROM kahta_accounts WHERE project_id = :pid AND is_active = 1 ORDER BY code');
 $kahtaStmt->execute([':pid' => $projectId]);
 $kahtas = $kahtaStmt->fetchAll();
+// اگر کهاته‌ی لینک‌شده به این پیش‌پرداخت غیرفعال شده باشد، همان را هم در فهرست
+// نگه می‌داریم تا هنگام ویرایش بی‌صدا از دست نرود.
+$kahtas = includeLinkedOptions($pdo, $kahtas, $a['kahta_account_id'] ?? null,
+    'SELECT id, code, name FROM kahta_accounts WHERE id = ?', [], 'name');
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     verifyCsrf();

@@ -30,6 +30,12 @@ if ($user['role_key'] === 'super_admin') {
     $stmt->execute([':id' => $user['company_id']]);
     $companies = $stmt->fetchAll();
 }
+// این کشو گزینه‌ی خالی ندارد. اگر شرکتِ یک پروژه غیرفعال شود، هیچ گزینه‌ای
+// «selected» نمی‌شود و مرورگر نخستین شرکت فهرست را می‌فرستد؛ در نتیجه پروژه
+// بی‌صدا و بدون هیچ خطایی به یک شرکت دیگر منتقل می‌شود. پس شرکت فعلی را حتی
+// اگر غیرفعال باشد در فهرست نگه می‌داریم.
+$companies = includeLinkedOptions($pdo, $companies, $project['company_id'] ?? null,
+    'SELECT id, name FROM companies WHERE id = ?', [], 'name');
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     verifyCsrf();

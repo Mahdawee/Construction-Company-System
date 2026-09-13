@@ -140,3 +140,56 @@ function queryWith(array $overrides): string
     $params = array_merge($_GET, $overrides);
     return '?' . http_build_query($params);
 }
+
+/**
+ * نگه‌داشتن مقدار فعلی یک فیلد انتخابی در فورم ویرایش
+ *
+ * فهرست‌های کشویی/چک‌باکسی معمولاً فقط رکوردهای «فعال» را نشان می‌دهند
+ * (is_active = 1 یا status != 'inactive'). اگر رکوردی که در حال ویرایش است به
+ * گزینه‌ای لینک باشد که بعداً غیرفعال شده، آن گزینه در HTML وجود نخواهد داشت؛
+ * در نتیجه مرورگر یا گزینه‌ی خالی را می‌فرستد (و لینک بی‌صدا پاک می‌شود) و یا
+ * وقتی گزینه‌ی خالی وجود ندارد، نخستین گزینه را می‌فرستد (و لینک بی‌صدا به یک
+ * رکورد دیگر تغییر می‌کند).
+ *
+ * این تابع گزینه‌های لینک‌شده‌ی مفقود را به فهرست اضافه می‌کند تا مقدار ذخیره‌شده
+ * همیشه از یک رفت‌وبرگشتِ فرم سالم بیرون بیاید. گزینه‌ی اضافه‌شده در برچسب خود
+ * با «(غیرفعال)» علامت‌گذاری می‌شود تا برای کاربر روشن باشد.
+ *
+ * @param array          $rows     ردیف‌های گزینه‌ای که قبلاً خوانده شده‌اند (هرکدام دارای id)
+ * @param int|array|null $linked   شناسه(های) فعلیِ لینک‌شده در رکورد
+ * @param string         $sql      کوئری SELECT با همان ستون‌ها برای «یک» شناسه (با یک ?)
+ * @param array          $bind     مقادیر بایندِ پیش از شناسه
+ * @param string         $labelCol ستونی که نشانه‌ی «(غیرفعال)» به آن اضافه می‌شود
+ * @return array همان فهرست، به‌همراه گزینه‌های مفقود
+ */
+function includeLinkedOptions(PDO $pdo, array $rows, $linked, string $sql, array $bind = [], string $labelCol = 'name'): array
+{
+    $ids = array_filter(array_map('intval', is_array($linked) ? $linked : [$linked]));
+    if (!$ids) {
+        return $rows;
+    }
+
+    $have = [];
+    foreach ($rows as $r) {
+        $have[(int)($r['id'] ?? 0)] = true;
+    }
+
+    $stmt = $pdo->prepare($sql);
+    foreach ($ids as $linkedId) {
+        if (isset($have[$linkedId])) {
+            continue;
+        }
+        $stmt->execute(array_merge($bind, [$linkedId]));
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (!$row) {
+            continue;
+        }
+        if (isset($row[$labelCol]) && is_string($row[$labelCol])) {
+            $row[$labelCol] .= ' (غیرفعال)';
+        }
+        $rows[] = $row;
+        $have[$linkedId] = true;
+    }
+
+    return $rows;
+}

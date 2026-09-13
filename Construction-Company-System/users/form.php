@@ -38,6 +38,10 @@ if ($user['role_key'] === 'super_admin') {
     $stmtP->execute([':cid' => $user['company_id']]);
     $projects = $stmtP->fetchAll();
 }
+// اگر شرکتِ یک کاربر غیرفعال شود، گزینه‌اش از کشو ناپدید می‌شود و با ذخیره‌ی
+// فرم، انتساب او به شرکت بی‌صدا پاک می‌گردد. شرکت فعلی را نگه می‌داریم.
+$companies = includeLinkedOptions($pdo, $companies, $editUser['company_id'] ?? null,
+    'SELECT id, name FROM companies WHERE id = ?', [], 'name');
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     verifyCsrf();

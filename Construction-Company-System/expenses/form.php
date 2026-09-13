@@ -26,6 +26,10 @@ $categories = $pdo->query('SELECT * FROM expense_categories ORDER BY name_fa')->
 $kahtaStmt = $pdo->prepare("SELECT k.id, k.code, k.name FROM kahta_accounts k WHERE k.project_id = :pid AND k.is_active = 1 ORDER BY k.code");
 $kahtaStmt->execute([':pid' => $projectId]);
 $kahtas = $kahtaStmt->fetchAll();
+// کهاته‌ی لینک‌شده به این مصرف حتی اگر غیرفعال شده باشد در فهرست می‌ماند،
+// وگرنه با ذخیره‌ی فرم لینک آن بی‌صدا پاک می‌شود.
+$kahtas = includeLinkedOptions($pdo, $kahtas, $ex['kahta_account_id'] ?? null,
+    'SELECT id, code, name FROM kahta_accounts WHERE id = ?', [], 'name');
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     verifyCsrf();

@@ -23,6 +23,11 @@ $errors = [];
 $empStmt = $pdo->prepare("SELECT id, full_name FROM employees WHERE project_id = :pid AND status = 'active' ORDER BY full_name");
 $empStmt->execute([':pid' => $projectId]);
 $employees = $empStmt->fetchAll();
+// مرخصیِ کارمندی که بعداً ختم شده باید همچنان کارمند خودش را نشان دهد؛
+// وگرنه با ذخیره، یا خطای «انتخاب کارمند الزامی است» می‌گیرد یا بی‌صدا به
+// کارمند دیگری منتقل می‌شود.
+$employees = includeLinkedOptions($pdo, $employees, $l['employee_id'] ?? null,
+    'SELECT id, full_name FROM employees WHERE id = ?', [], 'full_name');
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     verifyCsrf();

@@ -27,6 +27,11 @@ $currencies = $pdo->query('SELECT * FROM currencies ORDER BY id')->fetchAll();
 $kahtaStmt = $pdo->prepare("SELECT k.id, k.code, k.name FROM kahta_accounts k JOIN kahta_types t ON t.id=k.kahta_type_id WHERE k.project_id = :pid AND t.code = 'S' AND k.is_active = 1 ORDER BY k.code");
 $kahtaStmt->execute([':pid' => $projectId]);
 $kahtas = $kahtaStmt->fetchAll();
+// این فهرست دو فیلتر دارد (نوع «S» و فعال بودن). کهاته‌ی لینک‌شده به این کارمند
+// حتی اگر از این دو فیلتر بیرون بیفتد در فهرست نگه داشته می‌شود تا لینکش با
+// ذخیره‌ی فرم بی‌صدا از بین نرود.
+$kahtas = includeLinkedOptions($pdo, $kahtas, $emp['kahta_account_id'] ?? null,
+    'SELECT id, code, name FROM kahta_accounts WHERE id = ?', [], 'name');
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     verifyCsrf();

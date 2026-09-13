@@ -27,10 +27,17 @@ $currencies = $pdo->query('SELECT * FROM currencies ORDER BY id')->fetchAll();
 $custStmt = $pdo->prepare('SELECT id, name FROM customers WHERE project_id = :pid AND is_active = 1 ORDER BY name');
 $custStmt->execute([':pid' => $projectId]);
 $customers = $custStmt->fetchAll();
+// مشتریِ غیرفعالِ لینک‌شده به این قرارداد هم در کشو می‌ماند تا با ذخیره،
+// طرفِ قرارداد بی‌صدا پاک نشود.
+$customers = includeLinkedOptions($pdo, $customers, $ct['customer_id'] ?? null,
+    'SELECT id, name FROM customers WHERE id = ?', [], 'name');
 
 $kahtaStmt = $pdo->prepare("SELECT k.id, k.code, k.name FROM kahta_accounts k WHERE k.project_id = :pid AND k.is_active = 1 ORDER BY k.code");
 $kahtaStmt->execute([':pid' => $projectId]);
 $kahtas = $kahtaStmt->fetchAll();
+// همین‌طور برای کهاته‌ی لینک‌شده به این قرارداد.
+$kahtas = includeLinkedOptions($pdo, $kahtas, $ct['kahta_account_id'] ?? null,
+    'SELECT id, code, name FROM kahta_accounts WHERE id = ?', [], 'name');
 
 $machStmt = $pdo->prepare("SELECT id, name, machine_type, plate_or_serial_no FROM machinery WHERE project_id = :pid AND status != 'inactive' ORDER BY name");
 $machStmt->execute([':pid' => $projectId]);
@@ -42,6 +49,13 @@ if ($id) {
     $selStmt->execute([':id' => $id]);
     $selectedMachineryIds = array_map('intval', array_column($selStmt->fetchAll(), 'machinery_id'));
 }
+// رابطه‌ی چندبه‌چند ماشین‌آلات هنگام ذخیره کامل بازنویسی می‌شود
+// (DELETE و سپس INSERT فقط برای آنچه post شده). ماشینِ غیرفعالِ لینک‌شده در
+// فهرست چک‌باکس‌ها نبود، پس post هم نمی‌شد و لینکش بی‌صدا حذف می‌گردید.
+// با نگه‌داشتنش در فهرست، هم مقدار حفظ می‌شود و هم کاربر می‌تواند آگاهانه
+// تیکش را بردارد.
+$machineryList = includeLinkedOptions($pdo, $machineryList, $selectedMachineryIds,
+    'SELECT id, name, machine_type, plate_or_serial_no FROM machinery WHERE id = ?', [], 'name');
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     verifyCsrf();
