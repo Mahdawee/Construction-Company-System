@@ -15,7 +15,7 @@ $perPage = 20;
 
 $where = ['mr.project_id = :pid'];
 $params = [':pid' => $projectId];
-if ($search !== '') { $where[] = '(mr.sender LIKE :q OR mr.receiver LIKE :q OR mr.details LIKE :q OR mr.transfer_no LIKE :q)'; $params[':q'] = "%$search%"; }
+if ($search !== '') { $where[] = '(mr.sender LIKE :q1 OR mr.receiver LIKE :q2 OR mr.details LIKE :q3 OR mr.transfer_no LIKE :q4)'; $params[':q1'] = $params[':q2'] = $params[':q3'] = $params[':q4'] = "%$search%"; }
 if ($dateFrom) { $where[] = 'mr.receipt_date >= :from'; $params[':from'] = $dateFrom; }
 if ($dateTo) { $where[] = 'mr.receipt_date <= :to'; $params[':to'] = $dateTo; }
 $whereSql = implode(' AND ', $where);

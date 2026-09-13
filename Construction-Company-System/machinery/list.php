@@ -12,8 +12,8 @@ $statusFilter = $_GET['status'] ?? '';
 $sql = "SELECT m.*, c.code AS cur_code FROM machinery m LEFT JOIN currencies c ON c.id = m.currency_id WHERE m.project_id = :pid";
 $params = [':pid' => $projectId];
 if ($search !== '') {
-    $sql .= " AND (m.name LIKE :q OR m.machine_type LIKE :q OR m.plate_or_serial_no LIKE :q OR m.model LIKE :q)";
-    $params[':q'] = "%$search%";
+    $sql .= " AND (m.name LIKE :q1 OR m.machine_type LIKE :q2 OR m.plate_or_serial_no LIKE :q3 OR m.model LIKE :q4)";
+    $params[':q1'] = $params[':q2'] = $params[':q3'] = $params[':q4'] = "%$search%";
 }
 if ($statusFilter !== '') { $sql .= ' AND m.status = :st'; $params[':st'] = $statusFilter; }
 $sql .= ' ORDER BY m.name';

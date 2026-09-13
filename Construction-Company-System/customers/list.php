@@ -11,8 +11,8 @@ $search = trim($_GET['q'] ?? '');
 $sql = "SELECT * FROM customers WHERE project_id = :pid";
 $params = [':pid' => $projectId];
 if ($search !== '') {
-    $sql .= " AND (name LIKE :q OR contact_person LIKE :q OR phone LIKE :q OR id_number LIKE :q)";
-    $params[':q'] = "%$search%";
+    $sql .= " AND (name LIKE :q1 OR contact_person LIKE :q2 OR phone LIKE :q3 OR id_number LIKE :q4)";
+    $params[':q1'] = $params[':q2'] = $params[':q3'] = $params[':q4'] = "%$search%";
 }
 $sql .= " ORDER BY name";
 $stmt = $pdo->prepare($sql);

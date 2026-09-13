@@ -14,7 +14,7 @@ $sql = "SELECT e.*, c.code AS cur_code, k.code AS kahta_code FROM employees e
         LEFT JOIN kahta_accounts k ON k.id = e.kahta_account_id
         WHERE e.project_id = :pid";
 $params = [':pid' => $projectId];
-if ($search !== '') { $sql .= ' AND (e.full_name LIKE :q OR e.position LIKE :q OR e.tazkira_no LIKE :q)'; $params[':q'] = "%$search%"; }
+if ($search !== '') { $sql .= ' AND (e.full_name LIKE :q1 OR e.position LIKE :q2 OR e.tazkira_no LIKE :q3)'; $params[':q1'] = $params[':q2'] = $params[':q3'] = "%$search%"; }
 if ($statusFilter !== '') { $sql .= ' AND e.status = :st'; $params[':st'] = $statusFilter; }
 $sql .= ' ORDER BY e.full_name';
 $stmt = $pdo->prepare($sql);

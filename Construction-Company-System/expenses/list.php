@@ -16,7 +16,7 @@ $perPage = 20;
 
 $where = ['ex.project_id = :pid'];
 $params = [':pid' => $projectId];
-if ($search !== '') { $where[] = '(ex.payer LIKE :q OR ex.details LIKE :q OR ex.bill_no LIKE :q)'; $params[':q'] = "%$search%"; }
+if ($search !== '') { $where[] = '(ex.payer LIKE :q1 OR ex.details LIKE :q2 OR ex.bill_no LIKE :q3)'; $params[':q1'] = $params[':q2'] = $params[':q3'] = "%$search%"; }
 if ($dateFrom) { $where[] = 'ex.expense_date >= :from'; $params[':from'] = $dateFrom; }
 if ($dateTo) { $where[] = 'ex.expense_date <= :to'; $params[':to'] = $dateTo; }
 if ($categoryId) { $where[] = 'ex.category_id = :cat'; $params[':cat'] = $categoryId; }

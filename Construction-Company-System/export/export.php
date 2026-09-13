@@ -50,7 +50,7 @@ switch ($module) {
     case 'receipts':
         $where = ['mr.project_id = :pid']; $params = [':pid' => $projectId];
         $search = trim($_GET['q'] ?? ''); $dateFrom = sanitizeDate($_GET['from'] ?? null); $dateTo = sanitizeDate($_GET['to'] ?? null);
-        if ($search !== '') { $where[] = '(mr.sender LIKE :q OR mr.receiver LIKE :q OR mr.details LIKE :q OR mr.transfer_no LIKE :q)'; $params[':q'] = "%$search%"; }
+        if ($search !== '') { $where[] = '(mr.sender LIKE :q1 OR mr.receiver LIKE :q2 OR mr.details LIKE :q3 OR mr.transfer_no LIKE :q4)'; $params[':q1'] = $params[':q2'] = $params[':q3'] = $params[':q4'] = "%$search%"; }
         if ($dateFrom) { $where[] = 'mr.receipt_date >= :from'; $params[':from'] = $dateFrom; }
         if ($dateTo) { $where[] = 'mr.receipt_date <= :to'; $params[':to'] = $dateTo; }
         $stmt = $pdo->prepare('SELECT mr.*, c1.name_fa AS cur1, c2.name_fa AS cur2 FROM money_receipts mr LEFT JOIN currencies c1 ON c1.id=mr.currency_id LEFT JOIN currencies c2 ON c2.id=mr.currency2_id WHERE ' . implode(' AND ', $where) . ' ORDER BY mr.receipt_date DESC');
@@ -66,7 +66,7 @@ switch ($module) {
         $where = ['ex.project_id = :pid']; $params = [':pid' => $projectId];
         $search = trim($_GET['q'] ?? ''); $dateFrom = sanitizeDate($_GET['from'] ?? null); $dateTo = sanitizeDate($_GET['to'] ?? null);
         $categoryId = (int)($_GET['category_id'] ?? 0);
-        if ($search !== '') { $where[] = '(ex.payer LIKE :q OR ex.details LIKE :q OR ex.bill_no LIKE :q)'; $params[':q'] = "%$search%"; }
+        if ($search !== '') { $where[] = '(ex.payer LIKE :q1 OR ex.details LIKE :q2 OR ex.bill_no LIKE :q3)'; $params[':q1'] = $params[':q2'] = $params[':q3'] = "%$search%"; }
         if ($dateFrom) { $where[] = 'ex.expense_date >= :from'; $params[':from'] = $dateFrom; }
         if ($dateTo) { $where[] = 'ex.expense_date <= :to'; $params[':to'] = $dateTo; }
         if ($categoryId) { $where[] = 'ex.category_id = :cat'; $params[':cat'] = $categoryId; }
