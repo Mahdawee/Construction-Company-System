@@ -1,0 +1,104 @@
+/* سیستم مدیریت مالی پروژه‌های ساختمانی - استایل عمومی */
+:root {
+    --sidebar-width: 250px;
+    --brand-color: #10557a;
+    --brand-color-dark: #0b3d59;
+}
+
+body {
+    font-family: 'Tahoma', 'Vazirmatn', Arial, sans-serif;
+    background-color: #f2f4f7;
+    font-size: 14.5px;
+}
+
+/* ---- چیدمان اصلی ---- */
+.app-wrapper { display: flex; min-height: 100vh; }
+
+.sidebar {
+    width: var(--sidebar-width);
+    background: linear-gradient(180deg, var(--brand-color-dark), var(--brand-color));
+    color: #fff;
+    min-height: 100vh;
+    flex-shrink: 0;
+    position: sticky;
+    top: 0;
+    align-self: flex-start;
+    max-height: 100vh;
+    overflow-y: auto;
+}
+.sidebar .brand {
+    padding: 18px 16px;
+    font-weight: bold;
+    font-size: 16px;
+    border-bottom: 1px solid rgba(255,255,255,.15);
+}
+.sidebar .nav-link {
+    color: rgba(255,255,255,.85);
+    padding: 10px 18px;
+    border-right: 3px solid transparent;
+}
+.sidebar .nav-link:hover, .sidebar .nav-link.active {
+    background: rgba(255,255,255,.12);
+    color: #fff;
+    border-right-color: #ffc107;
+}
+.sidebar .nav-link i { width: 22px; display: inline-block; }
+.sidebar .nav-section-title {
+    padding: 10px 18px 4px;
+    font-size: 11px;
+    color: rgba(255,255,255,.55);
+    text-transform: uppercase;
+    letter-spacing: .5px;
+}
+
+.main-content { flex-grow: 1; min-width: 0; }
+
+.topbar {
+    background: #fff;
+    border-bottom: 1px solid #e3e6ea;
+    padding: 10px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.page-body { padding: 20px; }
+
+.card { border: none; box-shadow: 0 1px 3px rgba(0,0,0,.08); border-radius: 10px; }
+.card-header { background: #fff; border-bottom: 1px solid #eef0f2; font-weight: bold; border-radius: 10px 10px 0 0 !important; }
+
+.stat-card { border-radius: 12px; color: #fff; padding: 18px; position: relative; overflow: hidden; }
+.stat-card .stat-icon { font-size: 34px; opacity: .35; position: absolute; left: 16px; top: 14px; }
+.stat-card .stat-value { font-size: 22px; font-weight: bold; }
+.stat-card .stat-label { font-size: 13px; opacity: .9; }
+.bg-afn { background: linear-gradient(135deg,#1d7a4c,#28a862); }
+.bg-usd { background: linear-gradient(135deg,#155e91,#1f8fd8); }
+.bg-expense { background: linear-gradient(135deg,#a3291b,#d1442f); }
+.bg-balance { background: linear-gradient(135deg,#6c4fb6,#8a6fd6); }
+
+.table thead th { background: #f7f8fa; white-space: nowrap; font-size: 13px; }
+.table td, .table th { vertical-align: middle; }
+.badge-role { font-size: 11px; }
+
+footer.app-footer { text-align: center; padding: 14px; color: #98a2ad; font-size: 12.5px; }
+
+/* فرم‌ها */
+.required::after { content: " *"; color: #d1442f; }
+
+/* چاپ رسید / بل */
+.print-only { display: none; }
+@media print {
+    .no-print { display: none !important; }
+    .print-only { display: block !important; }
+    body { background: #fff; }
+    .page-body { padding: 0; }
+    .voucher-box { border: 1px solid #333; padding: 20px; }
+}
+
+@media (max-width: 900px) {
+    .sidebar { position: fixed; right: -260px; z-index: 1050; transition: right .2s; height: 100vh; }
+    .sidebar.show { right: 0; }
+    .app-wrapper { flex-direction: column; }
+}
